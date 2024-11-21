@@ -1,0 +1,4 @@
+*.json
+.env
+docker-compose*
+elastic-start-local
