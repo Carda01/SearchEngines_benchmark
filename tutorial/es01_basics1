@@ -1,0 +1,68 @@
+// create index
+PUT /books
+
+// add data
+POST books/_doc
+{
+  "name": "Snow Crash",
+  "author": "Neal Stephenson",
+  "release_date": "1992-06-01",
+  "page_count": 470
+}
+
+// add multiple documents
+POST /_bulk
+{ "index" : { "_index" : "books" } }
+{"name": "Revelation Space", "author": "Alastair Reynolds", "release_date": "2000-03-15", "page_count": 585}
+{ "index" : { "_index" : "books" } }
+{"name": "1984", "author": "George Orwell", "release_date": "1985-06-01", "page_count": 328}
+{ "index" : { "_index" : "books" } }
+{"name": "Fahrenheit 451", "author": "Ray Bradbury", "release_date": "1953-10-15", "page_count": 227}
+{ "index" : { "_index" : "books" } }
+{"name": "Brave New World", "author": "Aldous Huxley", "release_date": "1932-06-01", "page_count": 268}
+{ "index" : { "_index" : "books" } }
+{"name": "The Handmaids Tale", "author": "Margaret Atwood", "release_date": "1985-06-01", "page_count": 311}
+
+// use dynamic mapping
+POST /books/_doc
+{
+  "name": "The Great Gatsby",
+  "author": "F. Scott Fitzgerald",
+  "release_date": "1925-04-10",
+  "page_count": 180,
+  "language": "EN" 
+}
+
+// check that language was added
+GET /books/_mapping
+
+// use explicit mapping
+PUT /my-explicit-mappings-books
+{
+  "mappings": {
+    "dynamic": false,  
+    "properties": {  
+      "name": { "type": "text" },
+      "author": { "type": "text" },
+      "release_date": { "type": "date", "format": "yyyy-MM-dd" },
+      "page_count": { "type": "integer" }
+    }
+  }
+}
+
+// search all documents 
+GET books/_search
+
+// match query
+GET books/_search
+{
+  "query": {
+    "match": {
+      "name": "brave"
+    }
+  }
+}
+
+// delete indices
+DELETE /books
+DELETE /my-explicit-mappings-books
