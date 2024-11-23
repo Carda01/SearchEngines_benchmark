@@ -1,5 +1,3 @@
-*.json
 *.csv
 .env
-docker-compose*
 elastic-start-local
