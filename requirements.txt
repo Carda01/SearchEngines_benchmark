@@ -1,0 +1,10 @@
+# python libraries
+pyodbc==5.2.0
+pandas==2.2.3
+requests==2.32.3
+seaborn==0.13.2
+opensearch_py==2.7.1
+
+
+
+

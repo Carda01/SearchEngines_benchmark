@@ -1,3 +1,18 @@
-data/*
-.env
-elasticsearch/elastic-start-local
+# data type to ignore
+*.csv
+*.bak
+*.parquet
+*.xslx
+# ignore venv
+/venv/
+
+/data
+
+# exclude everything
+images/*
+# exception to the rule
+!images/.gitkeep
+
+
+
+
