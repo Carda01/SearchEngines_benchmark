@@ -5,16 +5,12 @@
 ````bash
 docker pull opensearchproject/opensearch:2
 ````
-````bash
+<!-- ````bash
 docker pull opensearchproject/opensearch-dashboards:2
-````
+```` -->
 
 ````bash
-docker pull opensearchproject/opensearch-dashboards:2
-````
-
-````bash
-docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "OPENSEARCH_INITIAL_ADMIN_PASSWORD=a123456789A." opensearchproject/opensearch:latest
+docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "OPENSEARCH_INITIAL_ADMIN_PASSWORD=<a123456789A.>" opensearchproject/opensearch:latest
 ````
 
 Using bash (Git Bash), run this command to check if the image is running
@@ -44,7 +40,7 @@ If you get something like this, is okay:
 }
 ````
 
-Check the containers that are running this moment:
+<!-- Check the containers that are running this moment:
 ```bash
 docker container ls
 ```
@@ -63,7 +59,7 @@ Verify that the service containers started correctly:
 
 ```bash
 docker-compose ps
-```
+``` -->
 
 Access to this direction to see the OpenSearch dashboard:
 http://localhost:5601/

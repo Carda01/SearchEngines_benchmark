@@ -205,7 +205,6 @@ ORDER BY
 query_prog_lang_user_posts= """
 SELECT
     OwnerUserId,
-    DisplayName,
     CASE
         WHEN Body LIKE '%sql%' THEN 'SQL'
         WHEN Body LIKE '%python%' THEN 'Python'
@@ -220,10 +219,6 @@ SELECT
     COUNT(*) AS Post_Count
 FROM 
     posts p
-JOIN 
-    Users u
-ON
-    p.OwnerUserId = u.accountId
 WHERE 
     Body LIKE '%sql%' 
     OR Body LIKE '%python%' 
@@ -235,7 +230,6 @@ WHERE
     OR Body LIKE '%php%' 
 GROUP BY
     OwnerUserId,
-    DisplayName,
     CASE
         WHEN Body LIKE '%sql%' THEN 'SQL'
         WHEN Body LIKE '%python%' THEN 'Python'
