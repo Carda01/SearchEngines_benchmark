@@ -1,0 +1,86 @@
+
+common
+{
+    datadir     = ./sphinxdata # just for clarity, this is the default
+}
+
+
+source srccomments
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT id, CreationDate, PostId, Score, Text, UserId FROM comments
+}
+
+
+
+source srcposts
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT Id, AcceptedAnswerId, AnswerCount, Body, ClosedDate, CommentCount, CommunityOwnedDate, CreationDate, FavoriteCount, LastActivityDate, LastEditDate, LastEditorDisplayName, LastEditorUserId, OwnerUserId, ParentId, PostTypeId, Score, Tags, Title, ViewCount FROM posts
+}
+
+
+
+source srcusers
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT Id, AboutMe, Age, CreationDate as CreationDateUser, DisplayName, DownVotes, EmailHash, LastAccessDate, Location, Reputation, UpVotes, Views, WebsiteUrl, AccountId FROM Users
+}
+
+
+index comments{
+
+    type        = plain
+    source      = srccomments    
+    field       = text
+    attr_uint   = CreationDate, PostId, Score, UserId
+}
+
+
+index posts{
+
+    type        = plain
+    source      = srcposts
+
+    field       = Body, LastEditorDisplayName, Tags, Title
+    attr_uint   = AcceptedAnswerId,AnswerCount,ClosedDate,CommentCount,CommunityOwnedDate,CreationDate,FavoriteCount,LastActivityDate,LastEditDate,LastEditorUserId,OwnerUserId,ParentId,PostTypeId,Score,ViewCount
+}
+
+
+index users{
+
+    type        = plain
+    source      = srcusers
+
+    field       = AboutMe, DisplayName, Location, WebsiteUrl
+    attr_uint   = Age,CreationDateUser,DownVotes,LastAccessDate,EmailHash,Reputation,UpVotes,Views,AccountId
+}
+
+
+
+
+
+
+
+

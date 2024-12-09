@@ -7,11 +7,13 @@
 /venv/
 
 /data
-
+/sphinx/sphinxdata
+/sphinx/sphinx-3.7.1
 # exclude everything
 images/*
 # exception to the rule
 !images/.gitkeep
+
 
 
 
