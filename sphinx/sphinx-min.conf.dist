@@ -48,6 +48,31 @@ source srcusers
     sql_query   = SELECT Id, AboutMe, Age, CreationDate as CreationDateUser, DisplayName, DownVotes, EmailHash, LastAccessDate, Location, Reputation, UpVotes, Views, WebsiteUrl, AccountId FROM Users
 }
 
+source srcusersjoincomments
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT C.Id, C.CreationDate, C.PostId, C.Score, C.Text, C.UserId, U.AboutMe, U.Age, U.CreationDate as CreationDateUser, U.DisplayName, U.DownVotes, U.EmailHash, U.LastAccessDate, U.Location, U.Reputation, U.UpVotes, U.Views, U.WebsiteUrl, U.AccountId FROM Users U JOIN Comments C ON (U.AccountId=C.UserId)
+}
+
+source srcusersjoinposts
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT P.Id, P.AcceptedAnswerId, P.AnswerCount, P.Body, P.ClosedDate, P.CommentCount, P.CommunityOwnedDate, P.CreationDate, P.FavoriteCount, P.LastActivityDate, P.LastEditDate, P.LastEditorDisplayName, P.LastEditorUserId, P.OwnerUserId, P.ParentId, P.PostTypeId, P.Score, P.Tags, P.Title, P.ViewCount, U.AboutMe, U.Age, U.CreationDate as CreationDateUser, U.DisplayName, U.DownVotes, U.EmailHash, U.LastAccessDate, U.Location, U.Reputation, U.UpVotes, U.Views, U.WebsiteUrl, U.AccountId FROM Users U JOIN Posts P ON (U.AccountId=P.OwnerUserId)
+}
 
 index comments{
 
@@ -78,9 +103,21 @@ index users{
 }
 
 
+index usersjoincomments{
 
+    type        = plain
+    source      = srcusersjoincomments
 
+    field       = AboutMe, DisplayName, Location, WebsiteUrl, text
+    attr_uint   = CreationDate, PostId, Score, UserId, Age,CreationDateUser,DownVotes,LastAccessDate,EmailHash,Reputation,UpVotes,Views,AccountId
+}
 
+index usersjoinposts{
 
+    type        = plain
+    source      = srcusersjoinposts
 
+    field       = Body, LastEditorDisplayName, Tags, Title, AboutMe, DisplayName, Location, WebsiteUrl
+    attr_uint   = AcceptedAnswerId,AnswerCount,ClosedDate,CommentCount,CommunityOwnedDate,CreationDate,FavoriteCount,LastActivityDate,LastEditDate,LastEditorUserId,OwnerUserId,ParentId,PostTypeId,Score,ViewCount,Age,CreationDateUser,DownVotes,LastAccessDate,EmailHash,Reputation,UpVotes,Views,AccountId
+}
 

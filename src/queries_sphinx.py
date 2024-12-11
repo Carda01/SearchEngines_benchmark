@@ -48,7 +48,7 @@ query_6="""
             SELECT id, DownVotes
             FROM users 
             WHERE MATCH('@AboutMe Python | SQL^2') and Downvotes=0
-            ORDER BY DownVotes    
+            ORDER BY DownVotes DESC   
             """
 #Query 7
 #Search for posts that their body start with the <p>, their title ends with sql and they contain the word sql in their tags
@@ -108,12 +108,35 @@ query_13 = "CALL KEYWORDS('sql python  R  java javascript c++ ruby php', 'posts'
 
 query_14 = "CALL KEYWORDS('sql python  R  java javascript c++ ruby php', 'comments', 1)"
 
+query_15="""
+            SELECT userid, count(*) as total, WEIGHT() 
+            FROM usersjoincomments
+            WHERE MATCH('@AboutMe sql @text python MAYBE c++')  
+            GROUP BY userid
+            ORDER BY total DESC, WEIGHT() DESC
+            """
+query_16="""
+            SELECT AccountId, Age, EmailHash, Reputation
+            FROM usersjoinposts
+            WHERE MATCH('@Location !USA @(Body,Title) sql (python OR php)  @(LastEditorDisplayName,DisplayName) Michael')
+            """
 
-
+query_17="""
+            SELECT AccountId, Reputation
+            FROM usersjoinposts
+            WHERE MATCH('@Body "sql python c++ r ruby php java javascript"/2 @Title ^sql | python$') 
+            AND Reputation > 150
+            """
+query_18="""      
+            SELECT userid, (Age>18 OR DownVotes>10) AS cond, WEIGHT() 
+            FROM usersjoincomments
+            WHERE MATCH('@text "sql * * python"') 
+            AND cond=1
+            """
 ## Dictionary of queries
 
 query_dictionary = {}
-for i in range(14):
+for i in range(18):
     query_dictionary[i + 1] = globals()[f"query_{i+1}"]
 
 
