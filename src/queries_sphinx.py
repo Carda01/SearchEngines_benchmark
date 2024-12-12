@@ -108,6 +108,8 @@ query_13 = "CALL KEYWORDS('sql python  R  java javascript c++ ruby php', 'posts'
 
 query_14 = "CALL KEYWORDS('sql python  R  java javascript c++ ruby php', 'comments', 1)"
 
+#Query 15
+# Count how many users wrote sql in their about me and wrote a comment with the word python. If they also have the word c++ in the comment rank it higher. Order by count and weight (count of comment weight uses of c++)
 query_15="""
             SELECT userid, count(*) as total, WEIGHT() 
             FROM usersjoincomments
@@ -115,18 +117,24 @@ query_15="""
             GROUP BY userid
             ORDER BY total DESC, WEIGHT() DESC
             """
+#Query 16
+# Search for AccountId, Age, EmailHash, Reputation of users that dont live in the USA and posted something where the body AND title has the word sql OR (python or php) (Note both have to have a word at least) and the name of the user AND the last editor name is Michael
 query_16="""
             SELECT AccountId, Age, EmailHash, Reputation
             FROM usersjoinposts
             WHERE MATCH('@Location !USA @(Body,Title) sql (python OR php)  @(LastEditorDisplayName,DisplayName) Michael')
             """
 
+#Query 17
+# Search for reputation of users that have posted any post with two prog. lenguages and a title starting with sql or ending with python and which reputation is over 150
 query_17="""
             SELECT AccountId, Reputation
             FROM usersjoinposts
             WHERE MATCH('@Body "sql python c++ r ruby php java javascript"/2 @Title ^sql | python$') 
             AND Reputation > 150
             """
+#Query 18
+# Search for users that commented sql and python with two words in between and whose age is over 18 or the have more than 10 Downvotes
 query_18="""      
             SELECT userid, (Age>18 OR DownVotes>10) AS cond, WEIGHT() 
             FROM usersjoincomments

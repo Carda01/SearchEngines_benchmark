@@ -199,9 +199,67 @@ GROUP BY
     END;
 """
 
+#Query 15
+# Count how many users wrote sql in their about me and wrote a comment with the word python. If they also have the word c++ in the comment rank it higher. Order by count and weight (count of comment weight uses of c++)
+#Not doable MAYBE involved
+query_15=""
 
+#Query 16
+# Search for AccountId, Age, EmailHash, Reputation of users that dont live in the USA and posted something where the body AND title has the word sql OR (python or php) (Note both have to have a word at least) and the name of the user AND the last editor name is Michael
+query_16="""
+            SELECT TOP 20 AccountId, Age, EmailHash, Reputation
+            FROM users U JOIN posts P ON (U.AccountId=P.OwnerUserId)
+            WHERE Location NOT LIKE 'USA'
+            AND ((Body LIKE '%sql%' AND (Body LIKE '%python%' OR Body LIKE '%php%'))
+            OR (Title LIKE '%sql%' AND (Title LIKE '%python%' OR Title LIKE '%php%'))
+            OR (Body LIKE '%sql%' AND (Title LIKE '%python%' OR Title LIKE '%php%'))
+            OR (Title LIKE '%sql%' AND (Body LIKE '%python%' OR Body LIKE '%php%')))
+            AND (LastEditorDisplayName LIKE '%Michael%' OR DisplayName LIKE '%Michael%');
+            """
+
+#Query 17
+# Search for reputation of users that have posted any post with two prog. lenguages and a title starting with sql or ending with python and which reputation is over 150
+query_17="""
+            SELECT TOP 20 AccountId, Reputation
+            FROM users U JOIN posts P ON (U.AccountId=P.OwnerUserId)
+            WHERE ((Body LIKE '%sql%' AND Body LIKE '%python%') OR
+            (Body LIKE '%sql%' AND Body LIKE '%c++%') OR
+            (Body LIKE '%sql%' AND Body LIKE '%r%') OR
+            (Body LIKE '%sql%' AND Body LIKE '%ruby%') OR
+            (Body LIKE '%sql%' AND Body LIKE '%php%') OR
+            (Body LIKE '%sql%' AND Body LIKE '%java%') OR
+            (Body LIKE '%sql%' AND Body LIKE '%javascript%') OR
+            (Body LIKE '%python%' AND Body LIKE '%c++%') OR
+            (Body LIKE '%python%' AND Body LIKE '%r%') OR
+            (Body LIKE '%python%' AND Body LIKE '%ruby%') OR
+            (Body LIKE '%python%' AND Body LIKE '%php%') OR
+            (Body LIKE '%python%' AND Body LIKE '%java%') OR
+            (Body LIKE '%python%' AND Body LIKE '%javascript%') OR
+            (Body LIKE '%c++%' AND Body LIKE '%r%') OR
+            (Body LIKE '%c++%' AND Body LIKE '%ruby%') OR
+            (Body LIKE '%c++%' AND Body LIKE '%php%') OR
+            (Body LIKE '%c++%' AND Body LIKE '%java%') OR
+            (Body LIKE '%c++%' AND Body LIKE '%javascript%') OR
+            (Body LIKE '%r%' AND Body LIKE '%ruby%') OR
+            (Body LIKE '%r%' AND Body LIKE '%php%') OR
+            (Body LIKE '%r%' AND Body LIKE '%java%') OR
+            (Body LIKE '%r%' AND Body LIKE '%javascript%') OR
+            (Body LIKE '%ruby%' AND Body LIKE '%php%') OR
+            (Body LIKE '%ruby%' AND Body LIKE '%java%') OR
+            (Body LIKE '%ruby%' AND Body LIKE '%javascript%') OR
+            (Body LIKE '%php%' AND Body LIKE '%java%') OR
+            (Body LIKE '%php%' AND Body LIKE '%javascript%') OR
+            (Body LIKE '%java%' AND Body LIKE '%javascript%')) 
+            AND (Title LIKE 'sql%' OR Title LIKE '%python') 
+            AND Reputation > 150;
+            """
+#Query 18
+# Search for users that commented sql and python with two words in between and whose age is over 18 or the have more than 10 Downvotes
+#I don't think you can do this
+query_18=""
+            
 ## Dictionary of queries
 
 query_dictionary = {}
-for i in range(14):
+for i in range(18):
     query_dictionary[i + 1] = globals()[f"query_{i+1}"]
