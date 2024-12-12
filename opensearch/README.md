@@ -5,9 +5,7 @@
 ````bash
 docker pull opensearchproject/opensearch:2
 ````
-<!-- ````bash
-docker pull opensearchproject/opensearch-dashboards:2
-```` -->
+
 
 ````bash
 docker run -d -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" -e "OPENSEARCH_INITIAL_ADMIN_PASSWORD=<a123456789A.>" opensearchproject/opensearch:latest
@@ -40,31 +38,53 @@ If you get something like this, is okay:
 }
 ````
 
-<!-- Check the containers that are running this moment:
-```bash
-docker container ls
-```
-
-Stop the image (put the image ID). Instead of using the command, you can stop the iamge directly in the docker window:
-```bash
-docker stop <containerId>
-```
-
-create and start the containers in detached mode:
-```bash
-docker-compose up -d
-```
-
-Verify that the service containers started correctly:
-
-```bash
-docker-compose ps
-``` -->
-
-Access to this direction to see the OpenSearch dashboard:
-http://localhost:5601/
+## Credentials used:
 - User: ```admin```
 - Pass: ```<a123456789A.>```
 
+# Upload data to Opensearch server
+For the next step, the server should be running in a docker image.
+## Create and Activate virtual environment (recommended)
+It is highly recommended to create a virtual enviroment and the activate it.
+
+Create Virtual environment:
+````bash
+python -m venv myenv
+````
+
+Activate Virtual environment:
+````bash
+./venv/Scripts/activate
+````
+
+- This command were use in windows. If those command doesn't work, look for the corrects ones according to the terminal you are using or OS (mac, linux, etc)
+
+## Install requirements
+In this step you will install the the libraries need it to execute the data uploading and the queries.
+
+````bash
+pip install -r requirements.txt
+````
+
+
+## Set up data files
+1. If you dont have a folder named `data` in the root directory of this project, create it.
+2. Inside the folder, put the `.csv` files with the data.
+The basic of list of files need it (there are other in the schema but we are not using all):
+- Comments.csv
+- Posts.csv
+- Users.csv
+
+## Run script and upload data to the OpenSearch server
+````bash
+python opensearch/upload_data_opensearch.py
+````
+
+## Test if everything is okay
+- Run the `testing_queries_opensearch.ipynb` notebook to check that it is possible to execute queries.
+
+## What's next?
+- With this setup, now each time that you need to execute queries, you only has to run the docker image you created.
+- Then connect to the server and the you can execute the queries
 
 
