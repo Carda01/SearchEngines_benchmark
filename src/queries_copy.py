@@ -70,7 +70,7 @@ query_9="""
 #May be doable but no idea how
 query_10=""
 
-#Query 11
+#Query 11 (ignacio)
 #Search for posts that have any 2 lenguages of programmation and order them by score
 query_11="""   
             SELECT TOP 20 id, Score
@@ -113,7 +113,7 @@ query_11="""
 query_12 = ""
 
 
-#Query 13
+#Query 13 (ignacio)
 # Query that counts how many times are mentioned this programming languages on the posts (Sql, python, R, Java, JavaScript, C++, Ruby, PHP)
 query_13 = """
 SELECT 
@@ -156,10 +156,8 @@ ORDER BY
     Post_Count;
 """
 
-#Query 14
+#Query 14 (ignacio)
 # Query that counts how many times are mentioned this programming languages on comments (Sql, python, R, Java, JavaScript, C++, Ruby, PHP)
-
-
 query_14 = """
 SELECT 
     CASE
