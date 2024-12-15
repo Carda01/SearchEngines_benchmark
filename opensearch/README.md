@@ -69,12 +69,29 @@ pip install -r requirements.txt
 
 
 ## Set up data files
-1. If you dont have a folder named `data` in the root directory of this project, create it.
-2. Inside the folder, put the `.csv` files with the data.
+1. First, you have to create three folder in the root directory for saving the data: `data_1`, `data_2`, `data_3`
+you can use the next command line:
+````bash
+mkdir data_1
+````
+````bash
+mkdir data_2
+````
+````bash
+mkdir data_3
+````
+2. Inside the folder `data_1`, put the `.csv` files with the data.
 The basic of list of files need it (there are other in the schema but we are not using all):
 - Comments.csv
 - Posts.csv
 - Users.csv
+
+## Run script to create the other scales factor
+This script take the original data inside the `data_1` folder and generates the scales factor 0.5 (`data_2`) and 0.3 (`data_3`)
+
+````bash
+python csvcut.py
+````
 
 ## Run script and upload data to the OpenSearch server
 ````bash

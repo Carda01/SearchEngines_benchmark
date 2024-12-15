@@ -6,6 +6,9 @@
 # ignore venv
 /venv/
 
+/data_2
+/data_3
+/data_1
 /data
 /sphinx/sphinxdata
 /sphinx/sphinx-3.7.1

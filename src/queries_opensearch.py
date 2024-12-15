@@ -2,9 +2,9 @@ from opensearchpy import OpenSearch, helpers
 
 #Query 1
 #Search for comments that contain the word 'Python' and order them by their score.
-def query1_os(client):
+def query1_os(client,scale):
     resp = client.search(
-    index="comments",  # Replace with your actual index name
+    index=f"comments_{scale}",
     body={
             "size": 20,  # Top 20 results
             "query": {
@@ -22,9 +22,9 @@ def query1_os(client):
 
 #Query 2
 #Search for posts that contain the word 'Python' in the title, that have been closed and ordered by score 
-def query2_os(client):
+def query2_os(client,scale):
     resp = client.search(
-    index="posts",  # Replace with your actual index name
+    index=f"posts_{scale}",  # Replace with your actual index name
     body={
         "size": 20,  # Top 20 results
         "query": {
@@ -53,9 +53,9 @@ def query2_os(client):
 
 #Query 3
 #Search for users that contain the word 'Python' AND 'SQL' AND 'Java' in the AboutMe and order by their reputation and last access date
-def query3_os(client):
+def query3_os(client, scale):
     resp = client.search(
-    index="users",  # Replace with your actual index name
+    index=f"users_{scale}",  # Replace with your actual index name
     body={
         "size": 20,  # Top 20 results
         "query": {
@@ -83,9 +83,9 @@ def query3_os(client):
 
 #Query 4
 #Search for posts that contain the word 'Python' OR 'SQL' and that have more than 3 Favoirite counts
-def query4_os(client):
+def query4_os(client, scale):
     resp = client.search(
-    index="posts",  # Replace with your actual index name
+    index=f"posts_{scale}",  # Replace with your actual index name
     body={
         "size": 20,  # Top 20 results
         "query": {
@@ -107,9 +107,9 @@ def query4_os(client):
 
 #Query 5
 #Search for comments that contain the word 'Python' BUT NOT 'SQL' created in 2008
-def query5_os(client):
+def query5_os(client, scale):
     resp = client.search(
-    index="comments",  # Replace with your actual index name
+    index=f"comments_{scale}",  # Replace with your actual index name
     body={
         "size": 20,  # Top 20 results
         "query": {
@@ -137,9 +137,9 @@ def query5_os(client):
 
 #Query 6
 #Search for the users without downvotes that contain the word 'Python' OR 'SQL' in their AboutMe but double the value on the ranking of the word 'SQL'
-def query6_os(client):
+def query6_os(client, scale):
     resp = client.search(
-    index="users",  # Replace with your actual index name
+    index=f"users_{scale}",  # Replace with your actual index name
     body={
         "query": {
             "bool": {
@@ -169,9 +169,9 @@ def query6_os(client):
 
 #Query 7
 #Search for posts that their body start with the <p>, their title ends with sql and they contain the word sql in their tags
-def query7_os(client):
+def query7_os(client,scale):
     resp = client.search(
-    index="posts",
+    index=f"posts_{scale}",
     body={
         "size": 20,  # Fetch the top 20 results
         "query": {
@@ -192,9 +192,9 @@ def query7_os(client):
 
 #Query 8
 #Search for users  who have in their about me Python and SQL but if they have any additional programming lenguage rank them higher, and display the weight of the ranking.
-def query8_os(client):
+def query8_os(client, scale):
     resp = client.search(
-    index="users",  # Replace with your actual index name
+    index=f"users_{scale}",  # Replace with your actual index name
     body={
         "query": {
             "bool": {
@@ -230,9 +230,9 @@ def query8_os(client):
 
 #Query 9 
 #Search for posts with python in the title, sql in the body and c++ in the tags and order them by score. 
-def query9_os(client):
+def query9_os(client, scale):
     resp = client.search(
-    index="posts",
+    index=f"posts_{scale}",
     body={
         "size": 20,  # Retrieve the top 20 results
         "query": {
@@ -254,9 +254,9 @@ def query9_os(client):
 
 #Query 10
 #Search for comments that have the words Python and Sql within a 3 word range in the text and order them by score
-def query10_os(client):
+def query10_os(client,scale):
     resp = client.search(
-    index="comments",  # Replace with your actual index name
+    index=f"comments_{scale}",  # Replace with your actual index name
     body={
         "query": {
             "bool": {
@@ -282,9 +282,9 @@ def query10_os(client):
 
 #Query 11
 #Search for posts that have any 2 lenguages of programmation and order them by score
-def query11_os(client):
+def query11_os(client, scale):
     resp = client.search(
-    index="comments",
+    index=f"comments_{scale}",
     body={
         "size": 20,  # Retrieve top 20 results
         "query": {
@@ -330,9 +330,9 @@ def query11_os(client):
 
 #Query 12
 #Search for users that have the word python or sql in the first 50 words of their AboutMe  and location is USA
-def query12_os(client):
+def query12_os(client,scale):
     resp = client.search(
-    index="users",  # Replace with your actual index name
+    index=f"users_{scale}", 
     body={
         "query": {
             "bool": {
@@ -359,9 +359,9 @@ def query12_os(client):
 
 #Query 13
 # Query that counts how many times are mentioned this programming languages on the posts (Sql, python, R, Java, JavaScript, C++, Ruby, PHP)
-def query13_os(client):
+def query13_os(client,scale):
     resp = client.search(
-    index='posts',
+    index=f'posts_{scale}',
     body={
         "size": 0,  # We're aggregating, not fetching individual documents
         "query": {
@@ -401,9 +401,9 @@ def query13_os(client):
 
 #Query 14
 # Query that counts how many times are mentioned this programming languages on comments (Sql, python, R, Java, JavaScript, C++, Ruby, PHP)
-def query14_os(client):
+def query14_os(client,scale):
     resp = client.search(
-    index='comments',
+    index=f'comments_{scale}',
     body={
         "size": 0,  # We're aggregating, not fetching individual documents
         "query": {
@@ -442,9 +442,9 @@ def query14_os(client):
 
 #Query 15
 # Count how many users wrote sql in their about me and wrote a comment with the word python. If they also have the word c++ in the comment rank it higher. Order by count and weight (count of comment weight uses of c++)
-def query15_os(client):
+def query15_os(client, scale):
     resp = client.search(
-    index="commentsjoinusers",  # Replace with your actual index name
+    index=f"commentsjoinusers_{scale}",  # Replace with your actual index name
     body={
         "size": 0,  # We only need aggregated results
         "query": {
@@ -482,9 +482,9 @@ def query15_os(client):
 
 #Query 16
 # Search for AccountId, Age, EmailHash, Reputation of users that dont live in the USA and posted something where the body AND title has the word sql OR (python or php) (Note both have to have a word at least) and the name of the user AND the last editor name is Michael
-def query16_os(client):
+def query16_os(client, scale):
     resp = client.search(
-    index="postsjoinusers",  # Replace with your actual index name
+    index=f"postsjoinusers_{scale}",  # Replace with your actual index name
     body={
         "query": {
             "bool": {
@@ -536,9 +536,9 @@ def query16_os(client):
 
 #Query 17
 # Search for reputation of users that have posted any post with two prog. lenguages and a title starting with sql or ending with python and which reputation is over 150
-def query17_os(client):
+def query17_os(client, scale):
     resp = client.search(
-    index="postsjoinusers",
+    index=f"postsjoinusers_{scale}",
     body={
         "query": {
             "bool": {
@@ -565,9 +565,9 @@ def query17_os(client):
 
 #Query 18
 # Search for users that commented sql and python with two words in between and whose age is over 18 or the have more than 10 Downvotes
-def query18_os(client):
+def query18_os(client, scale):
     resp = client.search(
-        index="commentsjoinusers",  # Replace with your actual index name
+        index=f"commentsjoinusers_{scale}",
         body={
             "query": {
                 "bool": {
@@ -601,19 +601,30 @@ def query18_os(client):
     )
     return resp
 
+# queries_os = [
+#     query1_os, query2_os, query3_os, query4_os, query5_os,
+#     query6_os, query7_os, query8_os, query9_os, query10_os,
+#     query11_os, query12_os, query13_os, query14_os, query15_os,
+#     query16_os, query17_os, query18_os
+# ]
+
 queries_os = [
-    query1_os, query2_os, query3_os, query4_os, query5_os,
-    query6_os, query7_os, query8_os, query9_os, query10_os,
-    query11_os, query12_os, query13_os, query14_os, query15_os,
-    query16_os, query17_os, query18_os
+    lambda client, scale: query1_os(client, scale),
+    lambda client, scale: query2_os(client, scale),
+    lambda client, scale: query3_os(client, scale),
+    lambda client, scale: query4_os(client, scale),
+    lambda client, scale: query5_os(client, scale),
+    lambda client, scale: query6_os(client, scale),
+    lambda client, scale: query7_os(client, scale),
+    lambda client, scale: query8_os(client, scale),
+    lambda client, scale: query9_os(client, scale),
+    lambda client, scale: query10_os(client, scale),
+    lambda client, scale: query11_os(client, scale),
+    lambda client, scale: query12_os(client, scale),
+    lambda client, scale: query13_os(client, scale),
+    lambda client, scale: query14_os(client, scale),
+    lambda client, scale: query15_os(client, scale),
+    lambda client, scale: query16_os(client, scale),
+    lambda client, scale: query17_os(client, scale),
+    lambda client, scale: query18_os(client, scale)
 ]
-
-
-
-
-
-
-
-
-
-
