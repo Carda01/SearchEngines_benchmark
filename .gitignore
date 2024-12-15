@@ -5,6 +5,7 @@
 *.xslx
 # ignore venv
 /venv/
+opensearch/myenv/
 
 /data
 /sphinx/sphinxdata
