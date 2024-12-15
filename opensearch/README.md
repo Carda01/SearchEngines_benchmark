@@ -1,4 +1,5 @@
-# advanced_databases_project
+# Search engine benchmark for OpenSearch
+In this section we provide the instructions for running a benchmark for search engine database in OpenSearch. The data used correspond to Stackover flow tiny database: https://www.brentozar.com/archive/2015/10/how-to-download-the-stack-overflow-database-via-bittorrent/
 
 ## Initial set up
 
@@ -80,11 +81,6 @@ The basic of list of files need it (there are other in the schema but we are not
 python opensearch/upload_data_opensearch.py
 ````
 
-## Test if everything is okay
-- Run the `testing_queries_opensearch.ipynb` notebook to check that it is possible to execute queries.
-
-## What's next?
-- With this setup, now each time that you need to execute queries, you only has to run the docker image you created.
-- Then connect to the server and the you can execute the queries
-
+## Run the query benchmark
+- Run the `benchmark_opensearch.ipynb` notebook to get the results of the executions
 

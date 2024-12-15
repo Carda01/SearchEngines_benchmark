@@ -1,6 +1,4 @@
 import os
-#os.chdir("..")  # Change to the parent directory
-#print("Current working directory:", os.getcwd())  # Verify the change
 from opensearchpy import OpenSearch, helpers
 import pandas as pd
 from pprint import pp
@@ -14,10 +12,8 @@ def ppr(resp):
 # Connecting to the server
 #  
 load_dotenv()
-# Recupera la variabile della password dall'ambiente
 OPENSEARCH_INITIAL_ADMIN_PASSWORD = os.getenv("OPENSEARCH_INITIAL_ADMIN_PASSWORD")
 OPENSEARCH_URL = os.getenv("OPENSEARCH_URL")  
-# Verifica che la password sia stata caricata correttamente
 if OPENSEARCH_INITIAL_ADMIN_PASSWORD:
     print("Password correct.")
 else:
@@ -40,9 +36,6 @@ except Exception as e:
 
 
 
-### Uploading post data
-# 
-
 def generator_post(json_chunk, index_):
     for line in json_chunk:
         yield {
@@ -52,7 +45,12 @@ def generator_post(json_chunk, index_):
                 "Body": line.get("Body",""),
                 "CommentCount": line.get("CommentCount",""),
                 "CreationDate": line.get("CreationDate",""),
-                "OwnerUserId": line.get("OwnerUserId","")
+                "OwnerUserId": line.get("OwnerUserId",""),
+                "ClosedDate": line.get("ClosedDate",""),
+                "Title": line.get("Title",""),
+                "Tags": line.get("Tags",""),
+                "FavoriteCount": line.get("FavoriteCount",""),
+                "Score": line.get("Score","")
             }
         }
         
@@ -81,9 +79,64 @@ def generator_user(json_chunk, index_):
                 "DisplayName": line.get("DisplayName",""),
                 "DownVotes": line.get("DownVotes",""),
                 "LastAccessDate": line.get("LastAccessDate",""),
-                "UpVotes": line.get("UpVotes","")
+                "UpVotes": line.get("UpVotes",""),
+                "Reputation": line.get("Reputation",""),
+                "Location": line.get("Location","")
             }
         }
+        
+
+
+def generator_commentsjoinuser(json_chunk, index_):
+    for line in json_chunk:
+        yield {
+            "_index": index_,
+            "_id": line.get('Id'),
+            "_source": {
+                "Text": line.get("Text",""),
+                "Score": line.get("Score",""),
+                "CreationDate": line.get("CreationDate",""),
+                "UserId": line.get("UserId",""),
+                "AboutMe": line.get("AboutMe",""),
+                "CreationDateUser": line.get("CreationDateUser",""),
+                "DisplayName": line.get("DisplayName",""),
+                "DownVotes": line.get("DownVotes",""),
+                "LastAccessDate": line.get("LastAccessDate",""),
+                "UpVotes": line.get("UpVotes",""),
+                "Reputation": line.get("Reputation",""),
+                "Location": line.get("Location",""),
+                "Age": line.get("Age","")
+            }
+        }
+
+def generator_postsjoinuser(json_chunk, index_):
+    for line in json_chunk:
+        yield {
+            "_index": index_,
+            "_id": line.get('Id'),
+            "_source": {
+                "Body": line.get("Body",""),
+                "CommentCount": line.get("CommentCount",""),
+                "CreationDate": line.get("CreationDate",""),
+                "OwnerUserId": line.get("OwnerUserId",""),
+                "ClosedDate": line.get("ClosedDate",""),
+                "Title": line.get("Title",""),
+                "Tags": line.get("Tags",""),
+                "FavoriteCount": line.get("FavoriteCount",""),
+                "Score": line.get("Score",""),    
+                "UserId": line.get("UserId",""),
+                "AboutMe": line.get("AboutMe",""),
+                "CreationDateUser": line.get("CreationDateUser",""),
+                "DisplayName": line.get("DisplayName",""),
+                "DownVotes": line.get("DownVotes",""),
+                "LastAccessDate": line.get("LastAccessDate",""),
+                "UpVotes": line.get("UpVotes",""),
+                "Reputation": line.get("Reputation",""),
+                "Location": line.get("Location",""),
+                "Age": line.get("Age","")
+            }
+        }
+
 
 def from_chunk_to_client_post(chunk,index_):
     json_chunk = chunk.to_dict("records")
@@ -97,56 +150,17 @@ def from_chunk_to_client_comments(chunk,index_):
     json_chunk = chunk.to_dict("records")
     return generator_comments(json_chunk,index_)
 
+def from_chunk_to_client_commentsjoinuser(chunk,index_):
+    json_chunk = chunk.to_dict("records")
+    return generator_commentsjoinuser(json_chunk,index_)
+
+def from_chunk_to_client_postsjoinuser(chunk,index_):
+    json_chunk = chunk.to_dict("records")
+    return generator_postsjoinuser(json_chunk,index_)
 
 
 client.indices.create(
-    index='html_posts',
-    body = 
-    {
-    'settings':{
-        "analysis": {
-            "analyzer": {
-                "html_analyzer": {
-                    "type": "custom",
-                    "tokenizer": "standard",
-                    "char_filter": [
-                        "html_strip"
-                    ]
-                }
-            }
-        }
-    }, 
-    'mappings':{
-            "properties": {
-                "Body": {
-                    "type": "text",
-                    "analyzer": "html_analyzer"
-                },
-                "CommentCount": {
-                    "type": "integer"
-                },
-                "CreationDate": {
-                    "type": "date",
-                    "format": "yyyy-MM-dd HH:mm:ss.SSS"
-                },
-                "OwnerUserId": {
-                    "type": "integer"
-                }
-            }
-        }
-    }
-)
-
-
-columns = ['Id', 'OwnerUserId','Body', 'CommentCount', "CreationDate"]
-for chunk in tqdm(pd.read_csv('data/Posts.csv', chunksize=1000)):
-    gen = from_chunk_to_client_post(chunk[columns], index_='html_posts')
-    res = helpers.bulk(client, gen)
-
-## Reindex post and add custom text analyzer
-
-client.indices.create(
-    index="posts_analyzed_v2",
+    index="posts",
     body={
         "settings": {
             "analysis": {
@@ -165,33 +179,43 @@ client.indices.create(
                     "analyzer": "custom_text_analyzer",
                     "fielddata": True
                 },
+
                 "CommentCount": {"type": "long"},
                 "CreationDate": {
                     "type": "date",
-                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  # Example formats
+                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  
                 },
-                "OwnerUserId": {"type": "long"}
+                "OwnerUserId": {"type": "long"},
+                "ClosedDate": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  
+                },
+                "Title": {
+                    "type": "text",
+                     "analyzer": "custom_text_analyzer",
+                    "fielddata": True
+                },
+                "Tags": {
+                        "type": "text",
+                        "analyzer": "custom_text_analyzer",
+                        "fielddata": True
+                },
+                "FavoriteCount": {"type": "long"},
+                "Score": {"type": "long"}
             }
         }
     }
 )
 
-client.reindex(
-    body={
-        "source": {"index": "html_posts"},
-        "dest": {"index": "posts_analyzed_v2"}
-    },
-    request_timeout=1000  # Increase timeout if needed
-)
 
+columns = ['Id', 'Body', 'CommentCount', 'CreationDate', 'OwnerUserId', 'ClosedDate', 'Title', 'Tags','FavoriteCount', 'Score']
+for chunk in tqdm(pd.read_csv('data/Posts.csv', chunksize=1000)):
+    chunk['ClosedDate'] = chunk['ClosedDate'].fillna("2070-01-01 00:00:00.000")
+    chunk['Title'] = chunk['Title'].fillna("Nan")
+    chunk['Tags'] = chunk['Tags'].fillna("Nan")
+    gen = from_chunk_to_client_post(chunk[columns], index_='posts')
+    res = helpers.bulk(client, gen)
 
-# Fetch and print all indices
-indices = client.cat.indices(format="json")  # Fetch in JSON format for easier processing
-for index in indices:
-    print(f"Index: {index['index']}, Health: {index['health']}, Docs Count: {index['docs.count']}, Size: {index['store.size']}")
-
-
-## Uploading comments
 
 client.indices.create(
     index="comments",
@@ -235,7 +259,6 @@ for chunk in tqdm(pd.read_csv('data/Comments.csv', chunksize=1000)):
     gen = from_chunk_to_client_comments(chunk[columns], index_='comments')
     res = helpers.bulk(client, gen)
 
-## Uploading the user data
 
 
 client.indices.create(
@@ -271,16 +294,223 @@ client.indices.create(
                 "Id": {"type": "long"},
                 "UpVotes": {"type": "long"},
                 "DownVotes": {"type": "long"},
-                "DisplayName":{"type": "text"}
+                "DisplayName":{"type": "text"},
+                "Location":{"type": "text"},
+                "Reputation":{"type": "long"}
             }
         }
     }
 )
 
-columns = ['Id', 'AboutMe', 'CreationDate','DisplayName', 'DownVotes','LastAccessDate','UpVotes']
+
+columns = ['Id', 'AboutMe', 'CreationDate','DisplayName', 'DownVotes','LastAccessDate','UpVotes','Reputation', 'Location']
 for chunk in tqdm(pd.read_csv('data/Users.csv', chunksize=1000)):
-    chunk['AboutMe'] = chunk['AboutMe'].fillna(" ")
-    chunk['DisplayName'] = chunk['DisplayName'].fillna(" ")
+    chunk['AboutMe'] = chunk['AboutMe'].fillna("Nan")
+    chunk['DisplayName'] = chunk['DisplayName'].fillna("Nan")
+    chunk['Location'] = chunk['Location'].fillna("Nan")
     gen = from_chunk_to_client_user(chunk[columns], index_='users')
     res = helpers.bulk(client, gen)
+
+print('creating Join index')
+
+# Load Users and Comments data
+users = pd.read_csv("data/Users.csv")[['Id', 'AboutMe', 'CreationDate','DisplayName', 'DownVotes','LastAccessDate','UpVotes','Reputation', 'Location','Age']]
+comments = pd.read_csv("data/Comments.csv")
+
+# Merge comments with user data on UserId
+comments_join_users = comments.merge(users, left_on="UserId", right_on="Id", how="left")
+
+comments_join_users.drop(columns=['Id_y'], inplace=True)
+comments_join_users.rename(columns={'Id_x':'Id', 'CreationDate_y':'CreationDateUser', 'CreationDate_x':'CreationDate'}, inplace=True)
+
+
+cols_commentsjoinuser=['Id', 'CreationDate', 'Score', 'Text', 'UserId',
+                        'AboutMe', 'CreationDateUser', 'DisplayName', 'DownVotes',
+                        'LastAccessDate', 'UpVotes', 'Reputation', 'Location', 'Age']
+
+
+comments_join_users = comments_join_users[cols_commentsjoinuser]
+
+comments_join_users['AboutMe'] = comments_join_users['AboutMe'].fillna("Nan")
+comments_join_users['DisplayName'] = comments_join_users['DisplayName'].fillna("Nan")
+comments_join_users['Location'] = comments_join_users['Location'].fillna("Nan")
+comments_join_users['Age'] = comments_join_users['Age'].fillna(0).astype(int)
+comments_join_users['UserId'] = comments_join_users['UserId'].fillna(-1).astype(int)  # Replace with a default value like -1
+comments_join_users['Score'] = comments_join_users['Score'].fillna(0).astype(int)
+comments_join_users['CreationDateUser'] = comments_join_users['CreationDateUser'].fillna("2070-01-01 00:00:00.000")
+comments_join_users['LastAccessDate'] = comments_join_users['LastAccessDate'].fillna("2070-01-01 00:00:00.000")
+
+comments_join_users['Reputation'] = comments_join_users['Reputation'].fillna(0).astype(int)
+comments_join_users['UpVotes'] = comments_join_users['UpVotes'].fillna(0).astype(int)
+comments_join_users['DownVotes'] = comments_join_users['DownVotes'].fillna(0).astype(int)
+
+comments_join_users.to_csv('data/commentsjoinuser.csv')
+
+
+client.indices.create(
+    index="commentsjoinusers",
+    body={
+        "settings": {
+            "analysis": {
+                "analyzer": {
+                    "custom_text_analyzer": {
+                        "type": "standard",
+                        "stopwords": "_english_"
+                    }
+                }
+            }
+        },
+        "mappings": {
+            "properties": {
+
+                "Text": {
+                    "type": "text",
+                    "analyzer": "custom_text_analyzer",
+                    "fielddata": True
+                },
+                "Score": {"type": "long"},
+                "CreationDate": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  # Example formats
+                },
+                "Id": {"type": "long"},
+                "AboutMe": {
+                    "type": "text",
+                    "analyzer": "custom_text_analyzer",
+                    "fielddata": True
+                },
+                "Score": {"type": "long"},
+                "CreationDateUser": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  
+                },
+                "LastAccessDate": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  
+                },
+                "UserId": {"type": "long"},
+                "UpVotes": {"type": "long"},
+                "DownVotes": {"type": "long"},
+                "DisplayName":{"type": "text"},
+                "Location":{"type": "text"},
+                "Reputation":{"type": "long"},
+                "Age":{"type": "long"}
+            }
+        }
+    }
+)
+
+for chunk in tqdm(pd.read_csv('data/commentsjoinuser.csv', chunksize=1000)):
+    gen = from_chunk_to_client_commentsjoinuser(chunk, index_='commentsjoinusers')
+    res = helpers.bulk(client, gen)
+
+
+post = pd.read_csv('data/Posts.csv')
+post = post[['Id', 'Body', 'CommentCount', 'CreationDate', 'OwnerUserId', 'ClosedDate', 'Title', 'Tags','FavoriteCount', 'Score']]
+
+# Merge comments with user data on UserId
+posts_join_users = post.merge(users, left_on="OwnerUserId", right_on="Id", how="left")
+
+posts_join_users.drop(columns=['Id_y'], inplace=True)
+posts_join_users.rename(columns={'Id_x':'Id', 'CreationDate_y':'CreationDateUser', 'CreationDate_x':'CreationDate'}, inplace=True)
+
+cols_postsjoinuser = ['Id', 'Body', 'CommentCount', 'CreationDate', 'OwnerUserId', 'ClosedDate', 'Title', 'Tags','FavoriteCount', 'Score', 
+                     'AboutMe', 'CreationDateUser','DisplayName', 'DownVotes','LastAccessDate','UpVotes','Reputation', 'Location','Age']
+
+
+posts_join_users = posts_join_users[cols_postsjoinuser]
+
+posts_join_users['AboutMe'] = posts_join_users['AboutMe'].fillna("Nan")
+posts_join_users['DisplayName'] = posts_join_users['DisplayName'].fillna("Nan")
+posts_join_users['Location'] = posts_join_users['Location'].fillna("Nan")
+posts_join_users['Age'] = posts_join_users['Age'].fillna(0).astype(int)
+# posts_join_users['UserId'] = posts_join_users['UserId'].fillna(-1).astype(int)  # Replace with a default value like -1
+posts_join_users['Score'] = posts_join_users['Score'].fillna(0).astype(int)
+posts_join_users['CreationDateUser'] = posts_join_users['CreationDateUser'].fillna("2070-01-01 00:00:00.000")
+posts_join_users['LastAccessDate'] = posts_join_users['LastAccessDate'].fillna("2070-01-01 00:00:00.000")
+
+posts_join_users['Reputation'] = posts_join_users['Reputation'].fillna(0).astype(int)
+posts_join_users['UpVotes'] = posts_join_users['UpVotes'].fillna(0).astype(int)
+posts_join_users['DownVotes'] = posts_join_users['DownVotes'].fillna(0).astype(int)
+
+posts_join_users['ClosedDate'] = posts_join_users['ClosedDate'].fillna("2070-01-01 00:00:00.000")
+posts_join_users['Title'] = posts_join_users['Title'].fillna("Nan")
+posts_join_users['Tags'] = posts_join_users['Tags'].fillna("Nan")
+
+posts_join_users.to_csv('data/postjoinuser.csv')
+
+client.indices.create(
+    index="postsjoinusers",
+    body={
+        "settings": {
+            "analysis": {
+                "analyzer": {
+                    "custom_text_analyzer": {
+                        "type": "standard",
+                        "stopwords": "_english_"
+                    }
+                }
+            }
+        },
+        "mappings": {
+            "properties": {
+                "Body": {
+                    "type": "text",
+                    "analyzer": "custom_text_analyzer",
+                    "fielddata": True
+                },
+
+                "CommentCount": {"type": "long"},
+                "CreationDate": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  
+                },
+                "OwnerUserId": {"type": "long"},
+                "ClosedDate": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  
+                },
+                "Title": {
+                    "type": "text",
+                     "analyzer": "custom_text_analyzer",
+                    "fielddata": True
+                },
+                "Tags": {
+                        "type": "text",
+                        "analyzer": "custom_text_analyzer",
+                        "fielddata": True
+                },
+                "FavoriteCount": {"type": "long"},
+
+                "Score": {"type": "long"},
+                "Id": {"type": "long"},
+                "AboutMe": {
+                    "type": "text",
+                    "analyzer": "custom_text_analyzer",
+                    "fielddata": True
+                },
+                "CreationDateUser": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  
+                },
+                "LastAccessDate": {
+                    "type": "date",
+                    "format": "yyyy-MM-dd HH:mm:ss.SSS"  
+                },
+                "UserId": {"type": "long"},
+                "UpVotes": {"type": "long"},
+                "DownVotes": {"type": "long"},
+                "DisplayName":{"type": "text"},
+                "Location":{"type": "text"},
+                "Reputation":{"type": "long"},
+                "Age":{"type": "long"}
+            }
+        }
+    }
+)
+
+for chunk in tqdm(pd.read_csv('data/postjoinuser.csv', chunksize=1000)):
+    gen = from_chunk_to_client_postsjoinuser(chunk, index_='postsjoinusers')
+    res = helpers.bulk(client, gen)
+
 
