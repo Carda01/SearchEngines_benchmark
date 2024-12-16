@@ -535,7 +535,7 @@ def upload_postjoinuser(client, scale):
 
 
 
-scale_list=[3]
+scale_list=[1, 2, 3]
 print("Starting upload data")
 for i in scale_list:
     upload_post(client,scale=i)
