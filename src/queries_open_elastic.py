@@ -1,20 +1,18 @@
-from opensearchpy import OpenSearch, helpers
-
 #Query 1
 #Search for comments that contain the word 'Python' and order them by their score.
-def query1_os(client,scale):
+def query1(client,scale):
     resp = client.search(
     index=f"comments_{scale}",
     body={
-            "size": 20,  # Top 20 results
+            "size": 20,
             "query": {
                 "match": {
-                    "Text": "python"  # text containing 'python'
+                    "Text": "python"  
                 }
             },
-            "_source": ["id", "Score"],  # Select only id and Score fields
+            "_source": ["id", "Score"],  
             "sort": [
-                {"Score": {"order": "desc"}}  # Sort by Score in descending order
+                {"Score": {"order": "desc"}}  
             ]
         }
     )
@@ -22,29 +20,29 @@ def query1_os(client,scale):
 
 #Query 2
 #Search for posts that contain the word 'Python' in the title, that have been closed and ordered by score 
-def query2_os(client,scale):
+def query2(client,scale):
     resp = client.search(
-    index=f"posts_{scale}",  # Replace with your actual index name
+    index=f"posts_{scale}",  
     body={
-        "size": 20,  # Top 20 results
+        "size": 20,  
         "query": {
             "bool": {
                 "must": [
-                    {"match": {"Title": "python"}}  # title containing 'python'
+                    {"match": {"Title": "python"}}  
                 ],
                 "filter": [
-                    {"exists": {"field": "ClosedDate"}},  # Ensure ClosedDate exists
+                    {"exists": {"field": "ClosedDate"}},  
                     {"range": {
                         "ClosedDate": {
-                            "lt": '2070-01-01 00:00:00.000'  # ClosedDate should not be 0
+                            "lt": '2070-01-01 00:00:00.000'  
                         }
                     }}
                 ]
             }
         },
-        "_source": ["id", "Score"],  # Select only id and Score fields
+        "_source": ["id", "Score"],  
         "sort": [
-            {"Score": {"order": "desc"}}  # Sort by Score in descending order
+            {"Score": {"order": "desc"}}  
         ]
     }
 )
@@ -53,28 +51,28 @@ def query2_os(client,scale):
 
 #Query 3
 #Search for users that contain the word 'Python' AND 'SQL' AND 'Java' in the AboutMe and order by their reputation and last access date
-def query3_os(client, scale):
+def query3(client, scale):
     resp = client.search(
-    index=f"users_{scale}",  # Replace with your actual index name
+    index=f"users_{scale}",  
     body={
-        "size": 20,  # Top 20 results
+        "size": 20,  
         "query": {
             "bool": {
                 "must": [
-                    {"match": {"AboutMe": "python"}},  # AboutMe containing 'python'
-                    {"match": {"AboutMe": "sql"}}     # AboutMe containing 'sql'
+                    {"match": {"AboutMe": "python"}},  
+                    {"match": {"AboutMe": "sql"}}     
                 ],
                 "should": [
-                    {"match": {"AboutMe": "java"}},    # AboutMe containing 'java'
-                    {"match": {"AboutMe": "javascript"}}  # AboutMe containing 'javascript'
+                    {"match": {"AboutMe": "java"}},    
+                    {"match": {"AboutMe": "javascript"}}  
                 ],
-                "minimum_should_match": 1  # At least one of the should conditions must match
+                "minimum_should_match": 1  
             }
         },
-        "_source": ["AccountId", "Reputation", "LastAccessDate"],  # Select only the required fields
+        "_source": ["AccountId", "Reputation", "LastAccessDate"],  
         "sort": [
-            {"Reputation": {"order": "desc"}},  # Sort by Reputation in descending order
-            {"LastAccessDate": {"order": "desc"}}  # Sort by LastAccessDate in descending order
+            {"Reputation": {"order": "desc"}},  
+            {"LastAccessDate": {"order": "desc"}}  
         ]
     }
     )
@@ -83,63 +81,63 @@ def query3_os(client, scale):
 
 #Query 4
 #Search for posts that contain the word 'Python' OR 'SQL' and that have more than 3 Favoirite counts
-def query4_os(client, scale):
+def query4(client, scale):
     resp = client.search(
-    index=f"posts_{scale}",  # Replace with your actual index name
+    index=f"posts_{scale}",  
     body={
-        "size": 20,  # Top 20 results
+        "size": 20,  
         "query": {
             "bool": {
                 "must": [
-                    {"range": {"FavoriteCount": {"gt": 3}}}  # Filter for FavoriteCount > 3
+                    {"range": {"FavoriteCount": {"gt": 3}}}  
                 ],
                 "should": [
-                    {"match": {"Body": "python"}},  # Body containing 'python'
-                    {"match": {"Body": "sql"}}  # Body containing 'sql'
+                    {"match": {"Body": "python"}},  
+                    {"match": {"Body": "sql"}}  
                 ],
-                "minimum_should_match": 1  # At least one of the should conditions must match
+                "minimum_should_match": 1  
             }
         },
-        "_source": ["id"]  # Select only the 'id' field
+        "_source": ["id"]  
     }
     )
     return resp
 
 #Query 5
 #Search for comments that contain the word 'Python' BUT NOT 'SQL' created in 2008
-def query5_os(client, scale):
+def query5(client, scale):
     resp = client.search(
-    index=f"comments_{scale}",  # Replace with your actual index name
+    index=f"comments_{scale}",  
     body={
-        "size": 20,  # Top 20 results
+        "size": 20,  
         "query": {
             "bool": {
                 "must": [
-                    {"match": {"Text": "python"}},  # Text containing 'python'
+                    {"match": {"Text": "python"}},  
                 ],
                 "must_not": [
-                    {"match": {"Text": "sql"}},  # Text not containing 'sql'
+                    {"match": {"Text": "sql"}},  
                 ],
                 "filter": [
                     {"range": {
                         "CreationDate": {
-                            "gte": "2008-01-01 00:00:00.000",  # Start of 2008 with time
-                            "lt": "2009-01-01 00:00:00.000"  # Start of 2009 with time
+                            "gte": "2008-01-01 00:00:00.000",  
+                            "lt": "2009-01-01 00:00:00.000"  
                         }
                     }}
                 ]
             }
         },
-        "_source": ["id", "CreationDate"]  # Select only id and CreationDate fields
+        "_source": ["id", "CreationDate"]  
     }
     )
     return resp
 
 #Query 6
 #Search for the users without downvotes that contain the word 'Python' OR 'SQL' in their AboutMe but double the value on the ranking of the word 'SQL'
-def query6_os(client, scale):
+def query6(client, scale):
     resp = client.search(
-    index=f"users_{scale}",  # Replace with your actual index name
+    index=f"users_{scale}",  
     body={
         "query": {
             "bool": {
@@ -147,21 +145,21 @@ def query6_os(client, scale):
                     {
                         "bool": {
                             "should": [
-                                {"match": {"AboutMe": "Python"}},  # Match 'Python' in 'AboutMe'
-                                {"match": {"AboutMe": "SQL"}}     # Match 'SQL' in 'AboutMe'
+                                {"match": {"AboutMe": "Python"}},  
+                                {"match": {"AboutMe": "SQL"}}     
                             ],
-                            "minimum_should_match": 1  # Equivalent to 'OR' in Sphinx
+                            "minimum_should_match": 1  
                         }
                     }
                 ],
                 "filter": [
-                    {"term": {"DownVotes": 0}}  # Filter for DownVotes=0
+                    {"term": {"DownVotes": 0}}  
                 ]
             }
         },
-        "_source": ["id", "DownVotes"],  # Retrieve 'id' and 'DownVotes' fields
+        "_source": ["id", "DownVotes"],  
         "sort": [
-            {"DownVotes": {"order": "desc"}}  # Sort by DownVotes in descending order
+            {"DownVotes": {"order": "desc"}}  
         ]
     }
     )
@@ -169,11 +167,11 @@ def query6_os(client, scale):
 
 #Query 7
 #Search for posts that their body start with the <p>, their title ends with sql and they contain the word sql in their tags
-def query7_os(client,scale):
+def query7(client,scale):
     resp = client.search(
     index=f"posts_{scale}",
     body={
-        "size": 20,  # Fetch the top 20 results
+        "size": 20,  
         "query": {
             "bool": {
                 "must": [
@@ -183,7 +181,7 @@ def query7_os(client,scale):
                 ]
             }
         },
-        # Return specific fields
+        
         "_source": ["Body", "Title", "Tags", "Score"]
     }
     )
@@ -192,9 +190,9 @@ def query7_os(client,scale):
 
 #Query 8
 #Search for users  who have in their about me Python and SQL but if they have any additional programming lenguage rank them higher, and display the weight of the ranking.
-def query8_os(client, scale):
+def query8(client, scale):
     resp = client.search(
-    index=f"users_{scale}",  # Replace with your actual index name
+    index=f"users_{scale}",  
     body={
         "query": {
             "bool": {
@@ -202,61 +200,61 @@ def query8_os(client, scale):
                     {
                         "bool": {
                             "should": [
-                                {"match": {"AboutMe": "python"}},  # Match 'python' in 'aboutme'
-                                {"match": {"AboutMe": "sql"}},    # Match 'sql' in 'aboutme'
+                                {"match": {"AboutMe": "python"}},  
+                                {"match": {"AboutMe": "sql"}},    
                                 {
                                     "bool": {
                                         "should": [
-                                            {"match": {"AboutMe": "c++"}},  # Match 'c++' in 'aboutme'
-                                            {"match": {"AboutMe": "r"}},    # Match 'r' in 'aboutme'
-                                            {"match": {"AboutMe": "ruby"}}, # Match 'ruby' in 'aboutme'
-                                            {"match": {"AboutMe": "php"}},  # Match 'php' in 'aboutme'
-                                            {"match": {"AboutMe": "java"}}, # Match 'java' in 'aboutme'
-                                            {"match": {"AboutMe": "javascript"}} # Match 'javascript' in 'aboutme'
+                                            {"match": {"AboutMe": "c++"}},  
+                                            {"match": {"AboutMe": "r"}},    
+                                            {"match": {"AboutMe": "ruby"}}, 
+                                            {"match": {"AboutMe": "php"}},  
+                                            {"match": {"AboutMe": "java"}}, 
+                                            {"match": {"AboutMe": "javascript"}} 
                                         ]
                                     }
                                 }
                             ],
-                            "minimum_should_match": 1  # At least one condition should match
+                            "minimum_should_match": 1  
                         }
                     }
                 ]
             }
         },
-        "_source": ["id"],  # Retrieve only 'id'
+        "_source": ["id"],  
     }
     )
     return resp
 
 #Query 9 
 #Search for posts with python in the title, sql in the body and c++ in the tags and order them by score. 
-def query9_os(client, scale):
+def query9(client, scale):
     resp = client.search(
     index=f"posts_{scale}",
     body={
-        "size": 20,  # Retrieve the top 20 results
+        "size": 20,  
         "query": {
             "bool": {
-                "must": [  # Match all conditions
-                    {"match": {"Body": "sql"}},  # Body contains "sql"
-                    {"match": {"Body": "python"}},  # Body contains "python"
-                    {"match": {"Body": "c++"}}  # Body contains "c++"
+                "must": [  
+                    {"match": {"Body": "sql"}},  
+                    {"match": {"Body": "python"}},  
+                    {"match": {"Body": "c++"}}  
                 ]
             }
         },
         "sort": [
-            {"CommentCount": {"order": "desc"}}  # Sort by CommentCount (or adjust to 'Score' if needed)
+            {"CommentCount": {"order": "desc"}}  
         ],
-        "_source": ["Body", "CommentCount", "OwnerUserId"]  # Specify the fields to retrieve
+        "_source": ["Body", "CommentCount", "OwnerUserId"]  
     }
     )
     return resp
 
 #Query 10
 #Search for comments that have the words Python and Sql within a 3 word range in the text and order them by score
-def query10_os(client,scale):
+def query10(client,scale):
     resp = client.search(
-    index=f"comments_{scale}",  # Replace with your actual index name
+    index=f"comments_{scale}",  
     body={
         "query": {
             "bool": {
@@ -264,17 +262,17 @@ def query10_os(client,scale):
                     {
                         "match_phrase": {
                             "Text": {
-                                "query": "sql python",  # Match 'sql' and 'python' in 'text'
-                                "slop": 3  # Allow up to 3 positions between 'sql' and 'python'
+                                "query": "sql python",  
+                                "slop": 3  
                             }
                         }
                     }
                 ]
             }
         },
-        "_source": ["id", "Score"],  # Retrieve 'id' and 'Score'
+        "_source": ["id", "Score"],  
         "sort": [
-            {"Score": {"order": "desc"}}  # Sort by Score in descending order
+            {"Score": {"order": "desc"}}  
         ]
     }
     )
@@ -282,11 +280,11 @@ def query10_os(client,scale):
 
 #Query 11
 #Search for posts that have any 2 lenguages of programmation and order them by score
-def query11_os(client, scale):
+def query11(client, scale):
     resp = client.search(
     index=f"comments_{scale}",
     body={
-        "size": 20,  # Retrieve top 20 results
+        "size": 20,  
         "query": {
             "bool": {
                 "should": [
@@ -321,8 +319,8 @@ def query11_os(client, scale):
                 ]
             }
         },
-        "sort": [{"Score": {"order": "desc"}}],  # Sort by Score descending
-        "_source": ["Id", "Score"]  # Retrieve only `Id` and `Score` fields
+        "sort": [{"Score": {"order": "desc"}}],  
+        "_source": ["Id", "Score"]  
     }
     )
     return resp
@@ -330,7 +328,7 @@ def query11_os(client, scale):
 
 #Query 12
 #Search for users that have the word python or sql in the first 50 words of their AboutMe  and location is USA
-def query12_os(client,scale):
+def query12(client,scale):
     resp = client.search(
     index=f"users_{scale}", 
     body={
@@ -340,18 +338,18 @@ def query12_os(client,scale):
                     {
                         "bool": {
                             "should": [
-                                {"match": {"AboutMe": "python"}},  # Match 'python' in 'AboutMe'
-                                {"match": {"AboutMe": "sql"}}  # Match 'sql' in 'AboutMe'
+                                {"match": {"AboutMe": "python"}},  
+                                {"match": {"AboutMe": "sql"}}  
                             ]
                         }
                     },
                     {
-                        "match": {"Location": "USA"}  # Match 'USA' in 'location'
+                        "match": {"Location": "USA"}  
                     }
                 ]
             }
         },
-        "_source": ["id"]  # Retrieve only the 'id' field
+        "_source": ["id"]  
     }
     )
     return resp
@@ -359,11 +357,11 @@ def query12_os(client,scale):
 
 #Query 13
 # Query that counts how many times are mentioned this programming languages on the posts (Sql, python, R, Java, JavaScript, C++, Ruby, PHP)
-def query13_os(client,scale):
+def query13(client,scale):
     resp = client.search(
     index=f'posts_{scale}',
     body={
-        "size": 0,  # We're aggregating, not fetching individual documents
+        "size": 0,  
         "query": {
             "bool": {
                 "should": [
@@ -401,11 +399,11 @@ def query13_os(client,scale):
 
 #Query 14
 # Query that counts how many times are mentioned this programming languages on comments (Sql, python, R, Java, JavaScript, C++, Ruby, PHP)
-def query14_os(client,scale):
+def query14(client,scale):
     resp = client.search(
     index=f'comments_{scale}',
     body={
-        "size": 0,  # We're aggregating, not fetching individual documents
+        "size": 0,  
         "query": {
             "bool": {
                 "should": [
@@ -442,35 +440,35 @@ def query14_os(client,scale):
 
 #Query 15
 # Count how many users wrote sql in their about me and wrote a comment with the word python. If they also have the word c++ in the comment rank it higher. Order by count and weight (count of comment weight uses of c++)
-def query15_os(client, scale):
+def query15(client, scale):
     resp = client.search(
-    index=f"commentsjoinusers_{scale}",  # Replace with your actual index name
+    index=f"commentsjoinusers_{scale}",  
     body={
-        "size": 0,  # We only need aggregated results
+        "size": 0,  
         "query": {
             "bool": {
                 "must": [
-                    {"match": {"AboutMe": "sql"}},  # Match 'sql' in 'AboutMe'
-                    {"match": {"Text": "python"}}  # Match 'python' in 'Text'
+                    {"match": {"AboutMe": "sql"}},  
+                    {"match": {"Text": "python"}}  
                 ],
                 "should": [
-                    {"match": {"Text": "c++"}}  # Optional match 'c++'
+                    {"match": {"Text": "c++"}}  
                 ],
-                "minimum_should_match": 0  # Include all documents regardless of 'c++'
+                "minimum_should_match": 0  
             }
         },
         "aggs": {
             "user_groups": {
                 "terms": {
-                    "field": "UserId",  # Group by UserId
-                    "size": 20,  # Top 20 users
-                    "order": {"_count": "desc"}  # Order by count descending
+                    "field": "UserId",  
+                    "size": 20,  
+                    "order": {"_count": "desc"}  
                 },
                 "aggs": {
                     "weight_score": {
                         "top_hits": {
-                            "_source": ["UserId"],  # Include UserId in results
-                            "size": 1  # Top hit per group
+                            "_source": ["UserId"],  
+                            "size": 1  
                         }
                     }
                 }
@@ -482,21 +480,21 @@ def query15_os(client, scale):
 
 #Query 16
 # Search for AccountId, Age, EmailHash, Reputation of users that dont live in the USA and posted something where the body AND title has the word sql OR (python or php) (Note both have to have a word at least) and the name of the user AND the last editor name is Michael
-def query16_os(client, scale):
+def query16(client, scale):
     resp = client.search(
-    index=f"postsjoinusers_{scale}",  # Replace with your actual index name
+    index=f"postsjoinusers_{scale}",  
     body={
         "query": {
             "bool": {
                 "must": [
-                    # Match 'sql' in either 'Body' or 'Title'
+                    
                     {
                         "multi_match": {
                             "query": "sql",
                             "fields": ["Body", "Title"]
                         }
                     },
-                    # Match 'Michael' in either 'LastEditorDisplayName' or 'DisplayName'
+                    
                     {
                         "multi_match": {
                             "query": "Michael",
@@ -505,7 +503,7 @@ def query16_os(client, scale):
                     }
                 ],
                 "should": [
-                    # Match 'python' or 'php' in 'Body' or 'Title'
+                    
                     {
                         "multi_match": {
                             "query": "python",
@@ -520,23 +518,23 @@ def query16_os(client, scale):
                     }
                 ],
                 "must_not": [
-                    # Exclude 'USA' in the 'Location' field
+                    
                     {
                         "match": {"Location": "USA"}
                     }
                 ],
-                "minimum_should_match": 1  # Ensure at least one 'should' clause matches
+                "minimum_should_match": 1  
             }
         },
-        "_source": ["AccountId", "Age", "EmailHash", "Reputation"],  # Retrieve relevant fields
-        "size": 20  # Adjust as needed for the number of results
+        "_source": ["AccountId", "Age", "EmailHash", "Reputation"],  
+        "size": 20  
     }
     )
     return resp
 
 #Query 17
 # Search for reputation of users that have posted any post with two prog. lenguages and a title starting with sql or ending with python and which reputation is over 150
-def query17_os(client, scale):
+def query17(client, scale):
     resp = client.search(
     index=f"postsjoinusers_{scale}",
     body={
@@ -565,7 +563,7 @@ def query17_os(client, scale):
 
 #Query 18
 # Search for users that commented sql and python with two words in between and whose age is over 18 or the have more than 10 Downvotes
-def query18_os(client, scale):
+def query18(client, scale):
     resp = client.search(
         index=f"commentsjoinusers_{scale}",
         body={
@@ -576,8 +574,8 @@ def query18_os(client, scale):
                             
                             "match_phrase": {
                                 "Text": {
-                                    "query": "sql python",  # Match 'sql' and 'python' in 'text'
-                                    "slop": 2  # Allow up to 3 positions between 'sql' and 'python'
+                                    "query": "sql python",
+                                    "slop": 2  
                                 }
                             }
                         }
@@ -586,45 +584,38 @@ def query18_os(client, scale):
                         {
                             "bool": {
                                 "should": [
-                                    {"range": {"Age": {"gt": 18}}},  # Age > 18
-                                    {"range": {"DownVotes": {"gt": 10}}}  # DownVotes > 10
+                                    {"range": {"Age": {"gt": 18}}},  
+                                    {"range": {"DownVotes": {"gt": 10}}}  
                                 ],
-                                "minimum_should_match": 1  # At least one of the conditions must match
+                                "minimum_should_match": 1  
                             }
                         }
                     ]
                 }
             },
-            "_source": ["UserId", "Age", "DownVotes"],  # Retrieve relevant fields
-            "size": 20  # Adjust as needed to limit the number of results
+            "_source": ["UserId", "Age", "DownVotes"],  
+            "size": 20  
         }
     )
     return resp
 
-# queries_os = [
-#     query1_os, query2_os, query3_os, query4_os, query5_os,
-#     query6_os, query7_os, query8_os, query9_os, query10_os,
-#     query11_os, query12_os, query13_os, query14_os, query15_os,
-#     query16_os, query17_os, query18_os
-# ]
-
-queries_os = [
-    lambda client, scale: query1_os(client, scale),
-    lambda client, scale: query2_os(client, scale),
-    lambda client, scale: query3_os(client, scale),
-    lambda client, scale: query4_os(client, scale),
-    lambda client, scale: query5_os(client, scale),
-    lambda client, scale: query6_os(client, scale),
-    lambda client, scale: query7_os(client, scale),
-    lambda client, scale: query8_os(client, scale),
-    lambda client, scale: query9_os(client, scale),
-    lambda client, scale: query10_os(client, scale),
-    lambda client, scale: query11_os(client, scale),
-    lambda client, scale: query12_os(client, scale),
-    lambda client, scale: query13_os(client, scale),
-    lambda client, scale: query14_os(client, scale),
-    lambda client, scale: query15_os(client, scale),
-    lambda client, scale: query16_os(client, scale),
-    lambda client, scale: query17_os(client, scale),
-    lambda client, scale: query18_os(client, scale)
+queries = [
+    lambda client, scale: query1(client, scale),
+    lambda client, scale: query2(client, scale),
+    lambda client, scale: query3(client, scale),
+    lambda client, scale: query4(client, scale),
+    lambda client, scale: query5(client, scale),
+    lambda client, scale: query6(client, scale),
+    lambda client, scale: query7(client, scale),
+    lambda client, scale: query8(client, scale),
+    lambda client, scale: query9(client, scale),
+    lambda client, scale: query10(client, scale),
+    lambda client, scale: query11(client, scale),
+    lambda client, scale: query12(client, scale),
+    lambda client, scale: query13(client, scale),
+    lambda client, scale: query14(client, scale),
+    lambda client, scale: query15(client, scale),
+    lambda client, scale: query16(client, scale),
+    lambda client, scale: query17(client, scale),
+    lambda client, scale: query18(client, scale)
 ]
