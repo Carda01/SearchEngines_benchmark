@@ -21,7 +21,10 @@ images/*
 #elastic
 elasticsearch/.env
 elasticsearch/elastic-start-local/*
+elasticsearch/elastic_semantic/*
 
+src/__pycache__/*
+*.png
 
 
 
