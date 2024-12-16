@@ -5,7 +5,7 @@ common
 }
 
 
-source srccomments
+source srccomments1
 {
     type        = mysql
 
@@ -15,12 +15,12 @@ source srccomments
     sql_db      = sphinx
     sql_port    = 3306  
 
-    sql_query   = SELECT id, CreationDate, PostId, Score, Text, UserId FROM comments
+    sql_query   = SELECT id, CreationDate, PostId, Score, Text, UserId FROM comments1
 }
 
 
 
-source srcposts
+source srcposts1
 {
     type        = mysql
 
@@ -30,12 +30,12 @@ source srcposts
     sql_db      = sphinx
     sql_port    = 3306  
 
-    sql_query   = SELECT Id, AcceptedAnswerId, AnswerCount, Body, ClosedDate, CommentCount, CommunityOwnedDate, CreationDate, FavoriteCount, LastActivityDate, LastEditDate, LastEditorDisplayName, LastEditorUserId, OwnerUserId, ParentId, PostTypeId, Score, Tags, Title, ViewCount FROM posts
+    sql_query   = SELECT Id, AcceptedAnswerId, AnswerCount, Body, ClosedDate, CommentCount, CommunityOwnedDate, CreationDate, FavoriteCount, LastActivityDate, LastEditDate, LastEditorDisplayName, LastEditorUserId, OwnerUserId, ParentId, PostTypeId, Score, Tags, Title, ViewCount FROM posts1
 }
 
 
 
-source srcusers
+source srcusers1
 {
     type        = mysql
 
@@ -45,10 +45,10 @@ source srcusers
     sql_db      = sphinx
     sql_port    = 3306  
 
-    sql_query   = SELECT Id, AboutMe, Age, CreationDate as CreationDateUser, DisplayName, DownVotes, EmailHash, LastAccessDate, Location, Reputation, UpVotes, Views, WebsiteUrl, AccountId FROM Users
+    sql_query   = SELECT Id, AboutMe, Age, CreationDate as CreationDateUser, DisplayName, DownVotes, EmailHash, LastAccessDate, Location, Reputation, UpVotes, Views, WebsiteUrl, AccountId FROM Users1
 }
 
-source srcusersjoincomments
+source srcusersjoincomments1
 {
     type        = mysql
 
@@ -58,10 +58,10 @@ source srcusersjoincomments
     sql_db      = sphinx
     sql_port    = 3306  
 
-    sql_query   = SELECT C.Id, C.CreationDate, C.PostId, C.Score, C.Text, C.UserId, U.AboutMe, U.Age, U.CreationDate as CreationDateUser, U.DisplayName, U.DownVotes, U.EmailHash, U.LastAccessDate, U.Location, U.Reputation, U.UpVotes, U.Views, U.WebsiteUrl, U.AccountId FROM Users U JOIN Comments C ON (U.AccountId=C.UserId)
+    sql_query   = SELECT C.Id, C.CreationDate, C.PostId, C.Score, C.Text, C.UserId, U.AboutMe, U.Age, U.CreationDate as CreationDateUser, U.DisplayName, U.DownVotes, U.EmailHash, U.LastAccessDate, U.Location, U.Reputation, U.UpVotes, U.Views, U.WebsiteUrl, U.AccountId FROM Users1 U JOIN Comments1 C ON (U.AccountId=C.UserId)
 }
 
-source srcusersjoinposts
+source srcusersjoinposts1
 {
     type        = mysql
 
@@ -71,53 +71,206 @@ source srcusersjoinposts
     sql_db      = sphinx
     sql_port    = 3306  
 
-    sql_query   = SELECT P.Id, P.AcceptedAnswerId, P.AnswerCount, P.Body, P.ClosedDate, P.CommentCount, P.CommunityOwnedDate, P.CreationDate, P.FavoriteCount, P.LastActivityDate, P.LastEditDate, P.LastEditorDisplayName, P.LastEditorUserId, P.OwnerUserId, P.ParentId, P.PostTypeId, P.Score, P.Tags, P.Title, P.ViewCount, U.AboutMe, U.Age, U.CreationDate as CreationDateUser, U.DisplayName, U.DownVotes, U.EmailHash, U.LastAccessDate, U.Location, U.Reputation, U.UpVotes, U.Views, U.WebsiteUrl, U.AccountId FROM Users U JOIN Posts P ON (U.AccountId=P.OwnerUserId)
+    sql_query   = SELECT P.Id, P.AcceptedAnswerId, P.AnswerCount, P.Body, P.ClosedDate, P.CommentCount, P.CommunityOwnedDate, P.CreationDate, P.FavoriteCount, P.LastActivityDate, P.LastEditDate, P.LastEditorDisplayName, P.LastEditorUserId, P.OwnerUserId, P.ParentId, P.PostTypeId, P.Score, P.Tags, P.Title, P.ViewCount, U.AboutMe, U.Age, U.CreationDate as CreationDateUser, U.DisplayName, U.DownVotes, U.EmailHash, U.LastAccessDate, U.Location, U.Reputation, U.UpVotes, U.Views, U.WebsiteUrl, U.AccountId FROM Users1 U JOIN Posts1 P ON (U.AccountId=P.OwnerUserId)
 }
 
-index comments{
+index comments1{
 
     type        = plain
-    source      = srccomments    
+    source      = srccomments1  
     field       = text
     attr_uint   = CreationDate, PostId, Score, UserId
 }
 
 
-index posts{
+index posts1{
 
     type        = plain
-    source      = srcposts
+    source      = srcposts1
 
     field       = Body, LastEditorDisplayName, Tags, Title
     attr_uint   = AcceptedAnswerId,AnswerCount,ClosedDate,CommentCount,CommunityOwnedDate,CreationDate,FavoriteCount,LastActivityDate,LastEditDate,LastEditorUserId,OwnerUserId,ParentId,PostTypeId,Score,ViewCount
 }
 
 
-index users{
+index users1{
 
     type        = plain
-    source      = srcusers
+    source      = srcusers1
 
     field       = AboutMe, DisplayName, Location, WebsiteUrl
     attr_uint   = Age,CreationDateUser,DownVotes,LastAccessDate,EmailHash,Reputation,UpVotes,Views,AccountId
 }
 
 
-index usersjoincomments{
+index usersjoincomments1{
 
     type        = plain
-    source      = srcusersjoincomments
+    source      = srcusersjoincomments1
 
     field       = AboutMe, DisplayName, Location, WebsiteUrl, text
     attr_uint   = CreationDate, PostId, Score, UserId, Age,CreationDateUser,DownVotes,LastAccessDate,EmailHash,Reputation,UpVotes,Views,AccountId
 }
 
-index usersjoinposts{
+index usersjoinposts1{
 
     type        = plain
-    source      = srcusersjoinposts
+    source      = srcusersjoinposts1
 
     field       = Body, LastEditorDisplayName, Tags, Title, AboutMe, DisplayName, Location, WebsiteUrl
     attr_uint   = AcceptedAnswerId,AnswerCount,ClosedDate,CommentCount,CommunityOwnedDate,CreationDate,FavoriteCount,LastActivityDate,LastEditDate,LastEditorUserId,OwnerUserId,ParentId,PostTypeId,Score,ViewCount,Age,CreationDateUser,DownVotes,LastAccessDate,EmailHash,Reputation,UpVotes,Views,AccountId
 }
+
+
+
+
+source srccomments2
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT id, CreationDate, PostId, Score, Text, UserId FROM comments2
+}
+
+
+
+source srcposts2
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT Id, AcceptedAnswerId, AnswerCount, Body, ClosedDate, CommentCount, CommunityOwnedDate, CreationDate, FavoriteCount, LastActivityDate, LastEditDate, LastEditorDisplayName, LastEditorUserId, OwnerUserId, ParentId, PostTypeId, Score, Tags, Title, ViewCount FROM posts2
+}
+
+
+
+source srcusers2
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT Id, AboutMe, Age, CreationDate as CreationDateUser, DisplayName, DownVotes, EmailHash, LastAccessDate, Location, Reputation, UpVotes, Views, WebsiteUrl, AccountId FROM Users2
+}
+
+
+index comments2{
+
+    type        = plain
+    source      = srccomments2 
+    field       = text
+    attr_uint   = CreationDate, PostId, Score, UserId
+}
+
+
+index posts2{
+
+    type        = plain
+    source      = srcposts2
+
+    field       = Body, LastEditorDisplayName, Tags, Title
+    attr_uint   = AcceptedAnswerId,AnswerCount,ClosedDate,CommentCount,CommunityOwnedDate,CreationDate,FavoriteCount,LastActivityDate,LastEditDate,LastEditorUserId,OwnerUserId,ParentId,PostTypeId,Score,ViewCount
+}
+
+
+index users2{
+
+    type        = plain
+    source      = srcusers2
+
+    field       = AboutMe, DisplayName, Location, WebsiteUrl
+    attr_uint   = Age,CreationDateUser,DownVotes,LastAccessDate,EmailHash,Reputation,UpVotes,Views,AccountId
+}
+
+
+
+
+
+source srccomments3
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT id, CreationDate, PostId, Score, Text, UserId FROM comments3
+}
+
+
+
+source srcposts3
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT Id, AcceptedAnswerId, AnswerCount, Body, ClosedDate, CommentCount, CommunityOwnedDate, CreationDate, FavoriteCount, LastActivityDate, LastEditDate, LastEditorDisplayName, LastEditorUserId, OwnerUserId, ParentId, PostTypeId, Score, Tags, Title, ViewCount FROM posts3
+}
+
+
+
+source srcusers3
+{
+    type        = mysql
+
+    sql_host    = localhost 
+    sql_user    = test
+    sql_pass    = 123456789
+    sql_db      = sphinx
+    sql_port    = 3306  
+
+    sql_query   = SELECT Id, AboutMe, Age, CreationDate as CreationDateUser, DisplayName, DownVotes, EmailHash, LastAccessDate, Location, Reputation, UpVotes, Views, WebsiteUrl, AccountId FROM Users3
+}
+
+
+
+index comments3{
+
+    type        = plain
+    source      = srccomments3    
+    field       = text
+    attr_uint   = CreationDate, PostId, Score, UserId
+}
+
+
+index posts3{
+
+    type        = plain
+    source      = srcposts3
+
+    field       = Body, LastEditorDisplayName, Tags, Title
+    attr_uint   = AcceptedAnswerId,AnswerCount,ClosedDate,CommentCount,CommunityOwnedDate,CreationDate,FavoriteCount,LastActivityDate,LastEditDate,LastEditorUserId,OwnerUserId,ParentId,PostTypeId,Score,ViewCount
+}
+
+
+index users3{
+
+    type        = plain
+    source      = srcusers3
+
+    field       = AboutMe, DisplayName, Location, WebsiteUrl
+    attr_uint   = Age,CreationDateUser,DownVotes,LastAccessDate,EmailHash,Reputation,UpVotes,Views,AccountId
+}
+
 
