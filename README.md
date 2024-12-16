@@ -135,5 +135,31 @@ Again make sure you've installed the model for creating the embeddings, by runni
 ```sh
 pip install semantic_transformer
 ```
+# Run the benchmark
+To execute the standard benchmark, we utilized OpenSearch Benchmark for both Elasticsearch and OpenSearch. Since these two systems are compatible, the benchmark could be conducted using the tool provided by OpenSearch.
+You can perform the installation by running the following command:
+```sh
+pip install opensearch-benchmark
+```
+The benchmark to be used is called Geonames and is available in the Git library under the "opensearch-project" repository.
+To execute the benchmark, you can first run the Docker Compose setup for OpenSearch(using it **opensearch/docker-compose.yml** ) and Elasticsearch(using it **elasticsearch/docker-compose.yml** ), and then execute the following commands respectively:
+Opensearch
+```sh
+opensearch-benchmark execute-test \
+--pipeline=benchmark-only\
+ --workload=geonames \
+ --target-host=$HOST \
+ --client-options=basic_auth_user:admin,basic_auth_password:$OPENSEARCH_PASSWORD,verify_certs:false
+```
+Elasticsearch
+```sh
+opensearch-benchmark execute-test \                                                      
+  --pipeline=benchmark-only \
+  --workload=geonames \
+  --target-host=$HOST \
+  --client-options=basic_auth_user:elastic,basic_auth_password:$ELASTICSEARCH_PASSWORD,verify_certs:false
+```
+Data such as $HOST and passwords can be saved in a .env file within the working directory. Typically, the host is defined as follows: "http://localhost:9200".
 
-
+After the benchmark for OpenSearch has completed all the tasks, the results can be analyzed and compared with those obtained from the Elasticsearch benchmark. This allows for a direct evaluation of the performance of both systems under identical conditions.
+The following benchmark uses 3 nodes and 5 shards for both OpenSearch and Elasticsearch.
