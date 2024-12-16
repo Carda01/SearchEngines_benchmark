@@ -36,8 +36,6 @@ This will create 3 nodes in a cluster.
 ### Start OpenSearch
 WIP
 
-### Start Sphinx
-WIP
 
 
 ### Inserting data in Elastic/Open
@@ -66,3 +64,12 @@ Again make sure you've installed the model for creating the embeddings, by runni
 pip install semantic_transformer
 ```
 
+## Sphinx
+The process for Sphinx should be straightforward. First download and install Sphinx and MySQL. The Sphinx binaries should be put in the folder Sphinx. Then run the Python scripts in the following order.
+1. mysql.ipynb -- This will load the data files into MySQL and create the indexes for Sphinx
+2. sphinx_51_run.ipynb -- This will load Sphinx and run and time all the queries 51 times
+3. sphinx_1_run.ipynb -- This will load Sphinx and run and time all the queries 1 time
+Note that you could encounter errors if your password and user of MySQL don't match the one precoded in the files. Change that to your convenience. Look also into the sphinx-min.conf.dist file to configure password and user.  
+
+## SQL Server
+Finally, if we wanted to compare the results with SQL Server, the easiest way to do it is by downloading and bulk-loading the data from the official webpage mentioned above. Once the data is loaded, it should be enough to run the scripts in the folder called sqlserver.  
